@@ -37,6 +37,9 @@ public:
 	FTimerHandle LevelTimerHandle;
 	FTimerHandle HUDUpdateTimerHandle;
 
+	UFUNCTION(BlueprintPure, Category = "Time")
+	float GetTimePercentage() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Score")
 	void AddScore(int32 Amount);
 	UFUNCTION(BlueprintCallable, Category = "Level")

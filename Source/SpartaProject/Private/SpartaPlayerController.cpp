@@ -101,6 +101,17 @@ void ASpartaPlayerController::ShowMainMenu(bool bIsRestart)
 				}
 			}
 		}
+		if (UTextBlock* ButtonText = Cast<UTextBlock>(MainMenuWidgetInstance->GetWidgetFromName(TEXT("Quit"))))
+		{
+			if (!bIsRestart)
+			{
+				ButtonText->SetText(FText::FromString(TEXT("Main Menu")));
+			}
+			else
+			{
+				ButtonText->SetText(FText::FromString(TEXT("Quit")));
+			}
+		}
 	}
 }
 

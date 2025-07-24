@@ -4,7 +4,6 @@
 #include "SpartaPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "CoinItem.h"
-#include "SpartaCharacter.h"
 #include "Components/TextBlock.h"
 #include "BluePrint/UserWidget.h"
 
@@ -157,6 +156,7 @@ void ASpartaGameState::OnGameOver()
 		if (ASpartaPlayerController* SpartaPlayerController = Cast<ASpartaPlayerController>(PlayerController))
 		{
 			SpartaPlayerController->ShowMainMenu(true);
+			GetWorldTimerManager().ClearTimer(LevelTimerHandle);
 		}
 	}
 }
@@ -194,4 +194,18 @@ void ASpartaGameState::UpdateHUD()
 	}
 }
 
+float ASpartaGameState::GetTimePercentage() const
+{
+	UWorld* World = GetWorld();
+	if (!World || LevelDuration <= 0.0f)
+	{
+		return 0.0f;
+	}
+
+	float CurrentElapsedTime = World->GetTimerManager().GetTimerElapsed(LevelTimerHandle); 
+    
+	float Percentage = 1.0f - (CurrentElapsedTime / LevelDuration);
+    
+	return FMath::Clamp(Percentage, 0.0f, 1.0f);
+}
 

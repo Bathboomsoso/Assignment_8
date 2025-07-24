@@ -5,7 +5,6 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Components/TextBlock.h"
 
@@ -34,6 +33,10 @@ ASpartaCharacter::ASpartaCharacter()
 
 	MaxHealth = 100.0f;
 	Health = MaxHealth;
+
+	bIsDebuff = false;
+
+	UpdateOverheadSpeed();
 }
 
 void ASpartaCharacter::BeginPlay()
@@ -45,7 +48,6 @@ void ASpartaCharacter::BeginPlay()
 void ASpartaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 	if (UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		if (ASpartaPlayerController* PlayerController = Cast<ASpartaPlayerController>(GetController()))
@@ -111,13 +113,13 @@ void ASpartaCharacter::Move(const FInputActionValue& value)
 	if (!FMath::IsNearlyZero(MoveInput.X))
 	{
 		AddMovementInput(GetActorForwardVector(), MoveInput.X);
-		
+		UpdateOverheadSpeed();
 	}
 
 	if (!FMath::IsNearlyZero(MoveInput.Y))
 	{
 		AddMovementInput(GetActorRightVector(), MoveInput.Y);
-		
+		UpdateOverheadSpeed();
 	}
 }
 
@@ -145,20 +147,36 @@ void ASpartaCharacter::Look(const FInputActionValue& value)
 	AddControllerPitchInput(LookInput.Y);
 }
 
-void ASpartaCharacter::StartSprint(const FInputActionValue& value)
+void ASpartaCharacter::StartSprint()
 {
 	if (GetCharacterMovement())
 	{
+		if (bIsDebuff) return;
 		GetCharacterMovement()->MaxWalkSpeed = SprintMoveSpeed;
 	}
 }
 
-void ASpartaCharacter::StopSprint(const FInputActionValue& value)
+void ASpartaCharacter::StopSprint()
 {
 	if (GetCharacterMovement())
 	{
+		if (bIsDebuff) return;
 		GetCharacterMovement()->MaxWalkSpeed = NormalMoveSpeed;
 	}
+}
+
+void ASpartaCharacter::SlowSpeed(float DebuffSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NormalMoveSpeed - DebuffSpeed;
+	UpdateOverheadSpeed();
+	bIsDebuff = true;
+}
+
+void ASpartaCharacter::FastSpeed(float BoostSpeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = NormalMoveSpeed + BoostSpeed;
+	UpdateOverheadSpeed();
+	bIsDebuff = false;
 }
 
 float ASpartaCharacter::GetHealth() const
@@ -191,8 +209,6 @@ float ASpartaCharacter::TakeDamage(
 	return ActualDamage;
 }
 
-
-
 void ASpartaCharacter::OnDeath()
 {
 	ASpartaGameState* SpartaGameState = GetWorld() ? GetWorld()->GetGameState<ASpartaGameState>() : nullptr;
@@ -215,5 +231,27 @@ void ASpartaCharacter::UpdateOverheadHP()
 	}
 }
 
+void ASpartaCharacter::UpdateOverheadSpeed()
+{
+	if (ASpartaPlayerController* SpartaPlayerController = Cast<ASpartaPlayerController>(GetController()))
+	{
+		if (UUserWidget* HUDWidget = SpartaPlayerController->GetHUDWidget())
+		{
+			if (UTextBlock* SpeedText = Cast<UTextBlock>(HUDWidget->GetWidgetFromName(TEXT("SpeedValue"))))
+			{
+				SpeedText->SetText(FText::FromString(FString::Printf(TEXT("Speed : %.f"), GetCharacterMovement()->MaxWalkSpeed)));
+			}
+		}
+	}
+}
+
+float ASpartaCharacter::GetHealthPercentage() const
+{
+	if (MaxHealth <= 0)
+	{
+		return 0.0f; // 0으로 나누는 것을 방지
+	}
+	return Health / MaxHealth;
+}
 
 

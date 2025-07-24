@@ -28,13 +28,20 @@ public:
 	float GetHealth() const;
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void AddHealth(float Amount);
-	
 
+	UFUNCTION()
+	void SlowSpeed(const float DebuffSpeed);
+	UFUNCTION()
+	void FastSpeed(const float BoostSpeed);
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetHealthPercentage() const;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float Health;
+	
 
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -53,14 +60,20 @@ protected:
 	UFUNCTION()
 	void Look(const FInputActionValue& value);
 	UFUNCTION()
-	void StartSprint(const FInputActionValue& value);
+	void StartSprint();
 	UFUNCTION()
-	void StopSprint(const FInputActionValue& value);
+	void StopSprint();
 
 	void OnDeath();
 	void UpdateOverheadHP();
-private:
+	void UpdateOverheadSpeed();
+
 	float NormalMoveSpeed;
+private:
 	float SprintMMoveSpeed;
 	float SprintMoveSpeed;
+	float SlowMoveSpeed;
+	float FastMoveSpeed;
+
+	bool bIsDebuff;
 };
