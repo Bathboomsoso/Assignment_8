@@ -169,16 +169,19 @@ void ASpartaCharacter::StopSprint()
 
 void ASpartaCharacter::SlowSpeed(float DebuffSpeed)
 {
+	bIsDebuff = true;
 	GetCharacterMovement()->MaxWalkSpeed = NormalMoveSpeed - DebuffSpeed;
 	UpdateOverheadSpeed();
-	bIsDebuff = true;
+	SlowDebuffIcon();
 }
 
 void ASpartaCharacter::FastSpeed(float BoostSpeed)
 {
+	bIsDebuff = false;
 	GetCharacterMovement()->MaxWalkSpeed = NormalMoveSpeed + BoostSpeed;
 	UpdateOverheadSpeed();
-	bIsDebuff = false;
+	ActiveBlind();
+	SlowDebuffIcon();
 }
 
 float ASpartaCharacter::GetHealth() const
@@ -251,27 +254,69 @@ float ASpartaCharacter::GetHealthPercentage() const
 {
 	if (MaxHealth <= 0)
 	{
-		return 0.0f; // 0으로 나누는 것을 방지
+		return 0.0f;
 	}
-	return Health / MaxHealth;
+	return (Health / MaxHealth);
 }
 
 void ASpartaCharacter::ActiveBlind()
 {
-	ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
-	if (!PC) return;
-	UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
-	UE_LOG(LogTemp, Warning, TEXT("1"))
-	if (!HUD) return;
-	UE_LOG(LogTemp, Warning, TEXT("2"))
-	if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("WBP_Blind"))))
+	if (bIsDebuff)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("3"))
-		UFunction* PlayAnimFunc = HUD->FindFunction(FName("Blind"));
-		if (PlayAnimFunc)
+		ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
+		if (!PC) return;
+		UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
+		if (!HUD) return;
+		if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("WBP_Blind"))))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("4"))
-			HUD->ProcessEvent(PlayAnimFunc, nullptr);
+			UFunction* PlayAnimFunc = HUD->FindFunction(FName("Blind"));
+			if (PlayAnimFunc)
+			{
+				HUD->ProcessEvent(PlayAnimFunc, nullptr);
+			}
 		}
 	}
+	else
+	{
+		ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
+		if (!PC) return;
+		UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
+		if (!HUD) return;
+		if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("WBP_Blind"))))
+		{
+			UFunction* Stop = HUD->FindFunction(FName("StopBlind"));
+			if (Stop)
+			{
+				HUD->ProcessEvent(Stop, nullptr);
+			}
+		}
+	}
+	
+}
+
+void ASpartaCharacter::SlowDebuffIcon()
+{
+	if (bIsDebuff)
+	{
+		ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
+		if (!PC) return;
+		UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
+		if (!HUD) return;
+		if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("SlowDebuff"))))
+		{
+			IG->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
+	else
+	{
+		ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
+		if (!PC) return;
+		UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
+		if (!HUD) return;
+		if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("SlowDebuff"))))
+		{
+			IG->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+	
 }

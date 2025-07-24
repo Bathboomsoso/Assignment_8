@@ -23,6 +23,7 @@ void ABlindPotion::ActivateItem(AActor* Activator)
 	{
 		if(ASpartaCharacter* SpartaGameState = Cast<ASpartaCharacter>(Activator))
 		{
+			SpartaGameState->bIsDebuff = true;
 			SpartaGameState->ActiveBlind();
 		}
 		DestroyedItem();

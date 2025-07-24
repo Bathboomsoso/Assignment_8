@@ -27,9 +27,13 @@ public:
 	UFUNCTION()
 	void FastSpeed(const float BoostSpeed);
 	void ActiveBlind();
+	
+	void SlowDebuffIcon();
 
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealthPercentage() const;
+	bool bIsDebuff;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	USpringArmComponent* SpringArmComp;
@@ -75,5 +79,5 @@ private:
 	float SlowMoveSpeed;
 	float FastMoveSpeed;
 
-	bool bIsDebuff;
+	
 };
