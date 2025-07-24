@@ -17,13 +17,6 @@ class SPARTAPROJECT_API ASpartaCharacter : public ACharacter
 public:
 	ASpartaCharacter();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	USpringArmComponent* SpringArmComp;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	UCameraComponent* CameraComp;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
-	UWidgetComponent* OverheadWidget;
-
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealth() const;
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -33,10 +26,17 @@ public:
 	void SlowSpeed(const float DebuffSpeed);
 	UFUNCTION()
 	void FastSpeed(const float BoostSpeed);
+	void ActiveBlind();
 
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealthPercentage() const;
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	USpringArmComponent* SpringArmComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	UCameraComponent* CameraComp;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+	UWidgetComponent* OverheadWidget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")

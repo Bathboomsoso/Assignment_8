@@ -1,8 +1,10 @@
 #include "SpartaCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "SpartaGameState.h"
+#include "SpartaHUD.h"
 #include "SpartaPlayerController.h"
 #include "Camera/CameraComponent.h"
+#include "Components/Image.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/WidgetComponent.h"
@@ -254,4 +256,22 @@ float ASpartaCharacter::GetHealthPercentage() const
 	return Health / MaxHealth;
 }
 
-
+void ASpartaCharacter::ActiveBlind()
+{
+	ASpartaPlayerController* PC = Cast<ASpartaPlayerController>(GetController());
+	if (!PC) return;
+	UUserWidget* HUD = Cast<UUserWidget>(PC->GetHUDWidget());
+	UE_LOG(LogTemp, Warning, TEXT("1"))
+	if (!HUD) return;
+	UE_LOG(LogTemp, Warning, TEXT("2"))
+	if (UImage* IG = Cast<UImage>(HUD->GetWidgetFromName(TEXT("WBP_Blind"))))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("3"))
+		UFunction* PlayAnimFunc = HUD->FindFunction(FName("Blind"));
+		if (PlayAnimFunc)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("4"))
+			HUD->ProcessEvent(PlayAnimFunc, nullptr);
+		}
+	}
+}
